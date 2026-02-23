@@ -116,63 +116,47 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = query.from_user
 
     # ===== VIEW PRODUCT =====
-if data.startswith("product_"):
-    product_id = data.split("_")[1]
+    if data.startswith("product_"):
+        product_id = data.split("_")[1]
 
-    product = next(
-        (p for p in config["products"] if p["id"] == product_id),
-        None
-    )
-
-    if not product:
-        return
-
-    caption = (
-        f"🛍 {product['name']}\n\n"
-        f"{product['description']}\n\n"
-        f"💰 Harga: {product['price']}"
-    )
-
-    keyboard = [
-        [InlineKeyboardButton("🛒 Beli di Shopee", callback_data=f"buy_{product_id}")],
-        [InlineKeyboardButton(
-            "💬 Tanya via Telegram",
-            url=f"https://t.me/{ADMIN_USERNAME}?text=Halo%20saya%20tertarik%20dengan%20{product['name']}"
-        )],
-        [InlineKeyboardButton("⬅️ Kembali", callback_data="back")]
-    ]
-
-    reply_markup = InlineKeyboardMarkup(keyboard)
-
-    # ===== Kalau cuma 1 foto =====
-    if isinstance(product["photo"], str):
-        with open(product["photo"], "rb") as photo:
-            await query.message.reply_photo(
-                photo=photo,
-                caption=caption,
-                reply_markup=reply_markup
-            )
-
-    # ===== Kalau banyak foto =====
-    elif isinstance(product["photo"], list):
-        media_group = []
-
-        for i, path in enumerate(product["photo"]):
-            with open(path, "rb") as photo:
-                if i == 0:
-                    media_group.append(
-                        InputMediaPhoto(media=photo.read(), caption=caption)
-                    )
-                else:
-                    media_group.append(
-                        InputMediaPhoto(media=photo.read())
-                    )
-
-        await query.message.reply_media_group(media_group)
-        await query.message.reply_text(
-            "Silakan pilih:",
-            reply_markup=reply_markup
+        product = next(
+            (p for p in config["products"] if p["id"] == product_id),
+            None
         )
+
+        if not product:
+            return
+
+        caption = (
+            f"🛍 {product['name']}\n\n"
+            f"{product['description']}\n\n"
+            f"💰 Harga: {product['price']}"
+        )
+
+        keyboard = [
+            [InlineKeyboardButton("🛒 Beli di Shopee", callback_data=f"buy_{product_id}")],
+            [InlineKeyboardButton(
+                "💬 Tanya via Telegram",
+                url=f"https://t.me/{ADMIN_USERNAME}?text=Halo%20saya%20tertarik%20dengan%20{product['name']}"
+            )],
+            [InlineKeyboardButton("⬅️ Kembali", callback_data="back")]
+        ]
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        try:
+            with open(product["photo"], "rb") as photo:
+                media = InputMediaPhoto(
+                    media=photo,
+                    caption=caption
+                )
+                await query.message.edit_media(
+                    media=media,
+                    reply_markup=reply_markup
+                )
+        except BadRequest as e:
+            if "Message is not modified" not in str(e):
+                raise
 
     # ===== BUY BUTTON (LOGGED) =====
     elif data.startswith("buy_"):
@@ -208,5 +192,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()
