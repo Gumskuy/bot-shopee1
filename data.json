@@ -64,13 +64,13 @@
     }
     ,
     {
-      "id": "p8",
-      "name": "Sheet mask skin & acne patch",
-      "photo": "images/8.jpg,images/9.jpg",
-      "description": "Sheet mask skin & acne patch (New Segel).",
-      "price": "Rp15.000",
-      "link": "https://id.shp.ee/CNFTPtF"
-    }
+  "id": "p8",
+  "name": "Sheet mask skin & acne patch",
+  "photo": ["images/8.jpg", "images/9.jpg"],
+  "description": "Sheet mask skin & acne patch (New Segel).",
+  "price": "Rp15.000",
+  "link": "https://id.shp.ee/CNFTPtF"
+}
     ,
     {
       "id": "p9",
@@ -82,4 +82,5 @@
     }
   ]
 }
+
 
